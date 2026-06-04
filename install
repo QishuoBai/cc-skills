@@ -142,6 +142,78 @@ check_path() {
   esac
 }
 
+# 自动将 bin 目录添加到 shell 配置的 PATH 中
+ensure_path() {
+  if check_path; then
+    return 0
+  fi
+
+  # 检测当前 shell 对应的配置文件
+  local rc_file=""
+  local shell_name
+  shell_name=$(basename "${SHELL:-/bin/bash}")
+
+  case "$shell_name" in
+    zsh)  rc_file="$HOME/.zshrc" ;;
+    bash)
+      if [[ -f "$HOME/.bashrc" ]]; then
+        rc_file="$HOME/.bashrc"
+      elif [[ -f "$HOME/.bash_profile" ]]; then
+        rc_file="$HOME/.bash_profile"
+      fi
+      ;;
+    fish) rc_file="$HOME/.config/fish/config.fish" ;;
+  esac
+
+  # 未检测到支持的 shell，回退到常见文件
+  if [[ -z "$rc_file" ]]; then
+    for f in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile"; do
+      if [[ -f "$f" ]]; then
+        rc_file="$f"
+        break
+      fi
+    done
+  fi
+
+  # 仍然找不到，尝试创建 ~/.zshrc（macOS 默认）
+  if [[ -z "$rc_file" ]]; then
+    rc_file="$HOME/.zshrc"
+  fi
+
+  local path_line='export PATH="$HOME/.local/bin:$PATH"'
+
+  # 检查配置文件中是否已有类似的未注释配置（避免重复添加）
+  if [[ -f "$rc_file" ]]; then
+    # 排除注释行（以 # 开头，允许前导空白），只匹配实际生效的 PATH 配置
+    if grep -v '^\s*#' "$rc_file" 2>/dev/null | grep -q '\.local/bin'; then
+      # 已有配置但当前 shell 未生效，提示用户 source
+      ok "$BIN_DIR 已在 $rc_file 的 PATH 配置中"
+      echo ""
+      info "当前终端未生效，请执行: ${C_DIM}source $rc_file${C_RESET}"
+      return 0
+    fi
+  fi
+
+  # 追加 PATH 配置
+  local marker="# cc-skills: add ~/.local/bin to PATH"
+  {
+    echo ""
+    echo "$marker"
+    if [[ "$shell_name" == "fish" ]]; then
+      echo 'fish_add_path "$HOME/.local/bin"'
+    else
+      echo "$path_line"
+    fi
+  } >> "$rc_file"
+
+  ok "已自动将 PATH 配置写入 ${C_BOLD}$rc_file${C_RESET}"
+  echo ""
+  info "当前终端立即生效，请执行: ${C_DIM}source $rc_file${C_RESET}"
+
+  # 尝试在当前 shell 中直接生效（导出到环境）
+  export PATH="$BIN_DIR:$PATH"
+}
+
 # 安装单个 CLI
 install_cli() {
   local name="$1"
@@ -295,18 +367,9 @@ cmd_install() {
     warn "${failed} 个安装失败或被跳过"
   fi
 
-  # PATH 检查
-  if ! check_path; then
-    echo ""
-    warn "$BIN_DIR 不在 PATH 中"
-    echo ""
-    echo "  请在你的 shell 配置中添加："
-    echo ""
-    echo "  ${C_BOLD}# ~/.zshrc 或 ~/.bashrc${C_RESET}"
-    echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
-    echo ""
-    echo "  然后执行: ${C_DIM}source ~/.zshrc${C_RESET}"
-  fi
+  # PATH 检查 & 自动配置
+  echo ""
+  ensure_path
 }
 
 cmd_uninstall() {
