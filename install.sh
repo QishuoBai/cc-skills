@@ -7,11 +7,11 @@
 # 约定：每个 CLI 是 clis/<name>/ 目录，内含同名可执行文件 <name>。
 #
 # 用法:
-#   ./install                       安装所有 CLI
-#   ./install <name>                安装指定 CLI
-#   ./install --list                列出所有可用 CLI
-#   ./install --uninstall           卸载所有已安装的 CLI
-#   ./install --uninstall <name>    卸载指定 CLI
+#   ./install.sh                       安装所有 CLI
+#   ./install.sh <name>                安装指定 CLI
+#   ./install.sh --list                列出所有可用 CLI
+#   ./install.sh --uninstall           卸载所有已安装的 CLI
+#   ./install.sh --uninstall <name>    卸载指定 CLI
 
 set -euo pipefail
 
@@ -315,8 +315,8 @@ cmd_list() {
   done <<< "$clis"
 
   echo ""
-  echo "  安装:   ${C_DIM}./install [name]${C_RESET}"
-  echo "  卸载:   ${C_DIM}./install --uninstall [name]${C_RESET}"
+  echo "  安装:   ${C_DIM}./install.sh [name]${C_RESET}"
+  echo "  卸载:   ${C_DIM}./install.sh --uninstall [name]${C_RESET}"
   echo ""
 }
 
@@ -412,22 +412,22 @@ cmd_help() {
 ${C_BOLD}cc-skills install${C_RESET} v${VERSION} — CLI 工具安装器
 
 ${C_BOLD}用法:${C_RESET}
-  ./install                         安装所有 CLI 工具
-  ./install <name>                  安装指定 CLI
-  ./install --list                  列出所有可用 CLI 及状态
-  ./install --uninstall             卸载所有已安装的 CLI
-  ./install --uninstall <name>      卸载指定 CLI
-  ./install --help                  显示本帮助
+  ./install.sh                         安装所有 CLI 工具
+  ./install.sh <name>                  安装指定 CLI
+  ./install.sh --list                  列出所有可用 CLI 及状态
+  ./install.sh --uninstall             卸载所有已安装的 CLI
+  ./install.sh --uninstall <name>      卸载指定 CLI
+  ./install.sh --help                  显示本帮助
 
 ${C_BOLD}约定:${C_RESET}
   每个 CLI 工具位于 clis/<name>/ 目录下，含同名可执行文件。
   安装时在 ${BIN_DIR} 创建 symlink 指向源文件。
 
 ${C_BOLD}示例:${C_RESET}
-  ./install                         ${C_GRAY}# 安装全部${C_RESET}
-  ./install openclaw-watchdog       ${C_GRAY}# 只安装 watchdog${C_RESET}
-  ./install --list                  ${C_GRAY}# 查看可用 CLI${C_RESET}
-  ./install --uninstall             ${C_GRAY}# 卸载全部${C_RESET}
+  ./install.sh                         ${C_GRAY}# 安装全部${C_RESET}
+  ./install.sh openclaw-watchdog       ${C_GRAY}# 只安装 watchdog${C_RESET}
+  ./install.sh --list                  ${C_GRAY}# 查看可用 CLI${C_RESET}
+  ./install.sh --uninstall             ${C_GRAY}# 卸载全部${C_RESET}
 
 EOF
 }

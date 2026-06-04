@@ -9,13 +9,13 @@ git clone https://github.com/QishuoBai/cc-skills.git
 cd cc-skills
 
 # 安装所有 CLI 工具
-./install
+./install.sh
 
 # 或安装指定工具
-./install openclaw-watchdog
+./install.sh openclaw-watchdog
 
 # 查看可用工具
-./install --list
+./install.sh --list
 ```
 
 安装后 CLI 工具通过 symlink 链接到 `~/.local/bin/`，首次使用请确保该目录在 PATH 中：
@@ -28,7 +28,7 @@ export PATH="$HOME/.local/bin:$PATH"
 ## 目录结构
 
 ```
-├── install           # 安装脚本
+├── install.sh        # 安装脚本
 ├── skills/           # Claude Code skills
 └── clis/             # 配套 CLI 工具
     └── openclaw-watchdog/
@@ -42,7 +42,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ## 添加新 CLI
 
-在 `clis/` 下创建目录，目录内放同名可执行文件即可被 `install` 自动发现：
+在 `clis/` 下创建目录，目录内放同名可执行文件即可被 `install.sh` 自动发现：
 
 ```
 clis/
@@ -51,7 +51,7 @@ clis/
     └── README.md    # 可选
 ```
 
-install 脚本会在文件头查找 `VERSION` 和 `—` 描述，用于 `--list` 展示：
+install.sh 脚本会在文件头查找 `VERSION` 和 `—` 描述，用于 `--list` 展示：
 
 ```bash
 #!/usr/bin/env bash
